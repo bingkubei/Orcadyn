@@ -1,0 +1,72 @@
+#!/usr/bin/awk -f
+BEGIN {
+# this program analyze the output files from orca
+# JAN 2020 1.0 version, based on 2010 version progdyn
+	i = 1;
+}
+
+/CARTESIAN COORDINATES \(ANGSTROEM\)/, /CARTESIAN COORDINATES \(A\.U\.\)/ {
+	if (length($4) > 7) {
+		A[i] = $2;
+		B[i] = $3;
+		C[i] = $4;
+		i++;
+	}
+}
+
+END {
+	C3C4 = Distance(3, 4);
+	C2C4 = Distance(2, 4);
+	printf("%s %.3f  %s %.3f\t", "C2C4", C2C4, "C3C4", C3C4);
+	if (runpoint > 2000) print "   Too many points.  XXXX";
+	if (C3C4 > 2.5) print "   7b formed!!! XXXX";
+	if (C2C4 > 2.5) print "   7a formed!!! XXXX";
+	system("date '+%b:%d:%Y %T'");
+	system("tail -1 Echeck | grep XXXX");
+}
+
+
+#Function Part
+function Distance(Atom1, Atom2) {
+	return sqrt((A[Atom1] - A[Atom2]) ^ 2 + (B[Atom1] - B[Atom2]) ^ 2 + (C[Atom1] - C[Atom2]) ^ 2);
+}
+
+function Angle(Atom1, Atom2, Atom3) {
+	value = (-Distance(Atom1, Atom3) ^ 2 + Distance(Atom1, Atom2) ^ 2 + Distance(Atom2, Atom3) ^ 2) / (2 * Distance(Atom1, Atom2) * Distance(Atom2, Atom3));
+	return acos(value);
+}
+
+function asin(x) {return 180 / 3.141592 * atan2(x, sqrt(1 - x * x));}
+
+function acos(x) {return 180 / 3.141592 * atan2(sqrt(1 - x * x), x);}
+
+function atan(x) {return 180 / 3.141592 * atan2(x , 1);}
+
+function Dihedral(Atom1, Atom2, Atom3, Atom4) {
+	B1x = A[Atom2] - A[Atom1];
+	B1y = B[Atom2] - B[Atom1];
+	B1z = C[Atom2] - C[Atom1];
+	B2x = A[Atom3] - A[Atom2];
+	B2y = B[Atom3] - B[Atom2];
+	B2z = C[Atom3] - C[Atom2];
+	B3x = A[Atom4] - A[Atom3];
+	B3y = B[Atom4] - B[Atom3];
+	B3z = C[Atom4] - C[Atom3];
+	modB2 = sqrt(B2x ^ 2 + B2y ^ 2 + B2z ^ 2);
+# yAx is x-coord. etc of modulus of B2 times B1
+	yAx = modB2 * B1x;
+	yAy = modB2 * B1y;
+	yAz = modB2 * B1z;
+# CP2 is the crossproduct of B2 and B3
+	CP2x = B2y * B3z - B2z * B3y;
+	CP2y = B2z * B3x - B2x * B3z;
+	CP2z = B2x * B3y - B2y * B3x;
+	termY = yAx * CP2x + yAy * CP2y + yAz * CP2z;
+# CP is the crossproduct of B1 and B2
+	CPx = B1y * B2z - B1z * B2y;
+	CPy = B1z * B2x - B1x * B2z;
+	CPz = B1x * B2y - B1y * B2x;
+	termX = CPx * CP2x + CPy * CP2y + CPz * CP2z;
+	dihed4 = 180 / 3.141592 * atan2(termY, termX);
+	return dihed4;
+}
