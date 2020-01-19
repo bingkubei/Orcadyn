@@ -1,0 +1,25 @@
+#!/bin/bash
+#SBATCH --partition=shared  
+#SBATCH --nodes=1  
+#SBATCH --ntasks-per-node=8
+#SBATCH --export=ALL
+#SBATCH -t 48:00:00
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=chenshusen2013@outlook.com
+#SBATCH --job-name=orcadynv1
+
+cd $SLURM_SUBMIT_DIR
+echo SLURM_SUBMIT_DIR:
+echo $SLURM_SUBMIT_DIR
+export origdir=$SLURM_SUBMIT_DIR 
+export scratchdir=/scratch/$USER/$SLURM_JOB_ID
+export orcaroot='/home/frdchen/orca'
+export RandGenerator=~/bin/randgen
+module load openmpi_ib
+
+
+export proggramdir=~/orcadynv1
+export freqfile=~/orcadynv1/6.out
+
+~/orcadynv1/progdynstarterHP
+rm -rf $scratchdir
