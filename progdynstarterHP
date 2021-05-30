@@ -43,7 +43,7 @@ do
 	        awk '/VIBRATIONAL FREQUENCIES/,/NORMAL MODES/ {print $1, $2}' $freqfile | awk '$2 * $2 > 0 {print $2}' > tempfreqs
 	        awk '/                  6          7/, /-----------/ {if(length($2) > 7) print $2, $3, $4, $5, $6, $7}' $freqfile > tempmodes
             awk '/FINAL ENERGY EVALUATION AT THE STATIONARY POINT|Single Point Calculation/, /INTERNAL COORDINATES/ \
-			{if($4 == 0) printf("%d %c %d %.3f %.6f %.6f %.6f\n", $1, $2, $3, $5, $6/1.889726, $7/1.889726, $8/1.889726)}' $freqfile > tempmasses
+			{if($4 == 0) printf("%d %s %d %.3f %.6f %.6f %.6f\n", $1, $2, $3, $5, $6/1.889726, $7/1.889726, $8/1.889726)}' $freqfile > tempmasses
 	        awk -f $proggramdir/proggenHP $freqfile > geoPlusVel
             if (test -f isomernumber) then
                 cp isomernumber temp533
