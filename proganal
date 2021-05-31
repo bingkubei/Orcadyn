@@ -22,7 +22,7 @@ END {
 	if (C3C4 > 2.5) print "   7b formed!!! XXXX";
 	if (C2C4 > 2.5) print "   7a formed!!! XXXX";
 	system("date '+%b:%d:%Y %T'");
-	system("tail -1 $proggramdir/Echeck | grep XXXX");
+	system("tail -1 $origdir/Echeck | grep XXXX");
 }
 
 
